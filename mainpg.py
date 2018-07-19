@@ -170,7 +170,7 @@ def waiting_screen(n):
         sub = rospy.Subscriber("kiwi", String, callback)
         if behavior_done:
             global behavior_done
-            behavior_done = false
+            behavior_done = False
             return
 
         pygame.display.update()
