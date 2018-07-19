@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import roslib; roslib.load_manifest('smach_example')
+import roslib; #roslib.load_manifest('smach_example')
 import rospy
 import smach
 import smach_ros
@@ -23,7 +23,7 @@ class PuzzleLevel(smach.State):
             self.done = True
         self.mutex.release()
 
-    def execute(self):
+    def execute(self, data):
         for i in range(0,3000):
             self.mutex.acquire()
             if self.done:

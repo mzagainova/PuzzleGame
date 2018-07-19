@@ -167,10 +167,59 @@ def waiting_screen(n):
         rate.sleep()
 
         #subscribes to reward behavior, calls callback when published
-        sub = rospy.Subscriber("reward", String, callback)
+        sub = rospy.Subscriber("kiwi", String, callback)
         if behavior_done:
+            global behavior_done
+            behavior_done = false
             return
 
+        pygame.display.update()
+        clock.tick(15)
+
+def final_ranking(n):
+    intro = True
+    global behavior_done
+    pub = rospy.Publisher('behavior_number', String, queue_size = 1)
+    rate = rospy.Rate(1)
+    #subscribes to reward behavior, calls callback when published
+    sub = rospy.Subscriber("reward", String, callback)
+
+    while intro:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        gameDisplay.blit(background, (00,00))
+        # References to images used
+        text('Thank you for completing this study.',(display_width/2),(display_height/2)-70,40,black,'coolvetica rg.ttf')
+        text('Lastly, please complete the last ranking questionnaire. You can replay the behaviors by pressing the buttons below.',(display_width/2),(display_height/2)-30,40,black,'coolvetica rg.ttf')
+
+        if(button_cont("Behavior 1",(display_width/2)-100,(display_height/1.2),200,100,white,black,black,white)):
+            pub.publish(str(1))
+            while(behavior_done == False):
+                rate.sleep()
+        elif(button_cont("Behavior 2",(display_width/2)-100,(display_height/1.2),200,100,white,black,black,white)):
+            pub.publish(str(2))
+            while(behavior_done == False):
+                rate.sleep()
+        elif(button_cont("Behavior 3",(display_width/2)-100,(display_height/1.2),200,100,white,black,black,white)):
+            pub.publish(str(3))
+            while(behavior_done == False):
+                rate.sleep()
+        elif(button_cont("Behavior 4",(display_width/2)-100,(display_height/1.2),200,100,white,black,black,white)):
+            pub.publish(str(4))
+            while(behavior_done == False):
+                rate.sleep()
+        elif(button_cont("Behavior 5",(display_width/2)-100,(display_height/1.2),200,100,white,black,black,white)):
+            pub.publish(str(5))
+            while(behavior_done == False):
+                rate.sleep()
+        elif(button_cont("Behavior 6",(display_width/2)-100,(display_height/1.2),200,100,white,black,black,white)):
+            pub.publish(str(6))
+            while(behavior_done == False):
+                rate.sleep()
+
+        behavior_done = False
         pygame.display.update()
         clock.tick(15)
 
