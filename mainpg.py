@@ -151,6 +151,7 @@ def callback(data):
 
 def waiting_screen(n):
     intro = True
+
     while intro:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -170,7 +171,7 @@ def waiting_screen(n):
         sub = rospy.Subscriber("kiwi", String, callback)
         if behavior_done:
             global behavior_done
-            behavior_done = false
+            behavior_done = False
             return
 
         pygame.display.update()

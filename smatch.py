@@ -66,6 +66,7 @@ class Questions(smach.State):
                 return 'repeat_puzzle'
             elif self.state == 2:
                 return 'final_ranking'
+            time.sleep(.1)
 
 # define state EndQuestions (final q)
 class EndQuestions(smach.State):
