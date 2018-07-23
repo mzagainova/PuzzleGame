@@ -126,7 +126,7 @@ def questionnaire_prompt(n):
             pub = rospy.Publisher('questions', String, queue_size = 1)
             rate = rospy.Rate(1)
             #if at last behavior, publish end msg
-            if n == 7:
+            if n == 8:
                 msg = "final ranking"
             else:
                 msg = "questions compelted"
