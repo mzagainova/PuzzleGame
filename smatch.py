@@ -14,7 +14,7 @@ class PuzzleLevel(smach.State):
         smach.State.__init__(self, outcomes=['level_done'])
         self.counter = 0
         self.done = False
-        self.subscriber = rospy.Subscriber('trigger', String, self.callback)
+        self.subscriber = rospy.Subscriber('trigger', String, self.callback, queue_size = 1)
 
     def callback(self, data):
         if data.data == "level completed":
@@ -32,7 +32,7 @@ class Behavior(smach.State):
         smach.State.__init__(self, outcomes=['reward_done'])
         self.done = False
         self.publisher = rospy.Publisher('reward', String, queue_size = 1)
-        self.subscriber = rospy.Subscriber("kiwi", String, self.callback)
+        self.subscriber = rospy.Subscriber("kiwi", String, self.callback, queue_size = 1)
 
     def callback(self, data):
         if data.data == "behavior completed":
@@ -45,37 +45,6 @@ class Behavior(smach.State):
                 return 'reward_done'
 
             time.sleep(.1)
-
-# define state questions (robot finished reward action, person fills out questionnaire)
-class Questions(smach.State):
-    def __init__(self):
-        smach.State.__init__(self, outcomes=['repeat_puzzle', 'final_ranking'])
-        self.subscriber = rospy.Subscriber("questions", String, self.callback)
-        self.state = 0
-
-    def callback(self, data):
-        if data.data == "questions compelted":
-            self.state = 1
-        elif data.data == "final ranking":
-            self.state = 2
-
-    def execute(self, state):
-        rospy.loginfo('Executing state Questions')
-        for i in range(0,3000):
-            if self.state == 1:
-                return 'repeat_puzzle'
-            elif self.state == 2:
-                return 'final_ranking'
-            time.sleep(.1)
-
-# define state EndQuestions (final q)
-class EndQuestions(smach.State):
-    def __init__(self):
-        smach.State.__init__(self, outcomes=['end_study'])
-
-    def execute(self, userdata):
-        rospy.loginfo('Executing state EndQuestions')
-        return 'end_study'
 
 # main
 def main():
@@ -90,12 +59,7 @@ def main():
         smach.StateMachine.add('PuzzleLevel', PuzzleLevel(),
                                transitions={'level_done':'Behavior'})
         smach.StateMachine.add('Behavior', Behavior(),
-                               transitions={'reward_done':'Questions'})
-        smach.StateMachine.add('Questions', Questions(),
-                               transitions={'repeat_puzzle':'PuzzleLevel',
-                                            'final_ranking':'EndQuestions'})
-        smach.StateMachine.add('EndQuestions', EndQuestions(),
-                               transitions={'end_study':'end_state'})
+                               transitions={'reward_done':'PuzzleLevel'})
 
     # Execute SMACH plan
     outcome = sm.execute()
