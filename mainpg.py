@@ -19,12 +19,6 @@ green = (0,255,0)
 blue = (0,0,255)
 yellow = (255,255,0)
 
-#music
-pygame.mixer.music.load('Bionic Commando (2009) - 18 - Piano Theme.mp3')
-pygame.mixer.music.set_volume(0.1)
-pygame.mixer.music.play(-1)
-######
-
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 #pygame.display.toggle_fullscreen()
 pygame.display.set_caption('Picture Puzzle Game')
@@ -60,8 +54,8 @@ pygame.display.set_icon(gameIcon)
 
 #random number array for behaviors
 num_behaviors = 7
-#list of num_behaviors random numbers, from 0 to num_behaviors
-rand_behaviors = random.sample(range(num_behaviors), num_behaviors)
+#list of num_behaviors random numbers, from 1 to num_behaviors
+rand_behaviors = random.sample(range(1, num_behaviors), num_behaviors-1)
 
 behavior_done = False
 
@@ -162,7 +156,10 @@ def waiting_screen(n):
         text('The robot is performing a reward behavior.',(display_width/2),(display_height/2)-70,40,black,'coolvetica rg.ttf')
         pub = rospy.Publisher('behavior_number', String, queue_size = 1)
         rate = rospy.Rate(1)
-        msg = str(rand_behaviors[n])
+        if n == 0:
+            msg = str(0)
+        else:
+            msg = str(rand_behaviors[n-1])
         #published number of random behavior to topic
         pub.publish(msg)
         rate.sleep()
@@ -358,6 +355,11 @@ def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None):
                 talker()
                 waiting_screen(5)
                 questionnaire_prompt(7)
+                game_loop(7)
+            elif level == 7 and tile.count(True) == 8:
+                talker()
+                waiting_screen(6)
+                questionnaire_prompt(8)
                 game_intro()
 
 
