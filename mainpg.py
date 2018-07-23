@@ -48,6 +48,10 @@ raspberry = pygame.image.load('raspberry.jpg')
 strawberry = pygame.image.load('strawberry.jpg')
 whale = pygame.image.load('whale.jpg')
 tree = pygame.image.load('tree.jpg')
+tree2 = pygame.image.load('tree2.jpg')
+greenapple = pygame.image.load('apple_green.jpg')
+parrot = pygame.image.load('parrot.jpg')
+rocket = pygame.image.load('rocket.jpg')
 
 gameIcon = pygame.image.load('pictureIcon.png')
 pygame.display.set_icon(gameIcon)
@@ -255,7 +259,9 @@ def check_same(tile, choosen):
 def l_random(level = 1):
     # 3 x 2
     # 4 x 2
-    l=[[spring,winter,fall],[spring,winter,fall,summer],[airplane, boat, house, light],[avocado, banana, strawberry, cherry],[dog, fox, raccoon, penguin],[elephant, whale,orange, raspberry], [elephant, whale,orange, raspberry]]
+
+    l=[[spring,winter,fall],[spring,winter,fall,summer],[airplane, boat, house, light],[avocado, banana, strawberry, cherry],[dog, fox, raccoon, penguin],[elephant, whale,orange, raspberry], [rocket, tree2, greenapple, parrot]]
+
     l_final =[]
     while len(l_final) != len(l[level-1])*2:
         choice = l[level-1][random.randint(0,len(l[level-1])-1)]
