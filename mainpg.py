@@ -231,7 +231,6 @@ def game_intro():
                 quit()
         gameDisplay.blit(background, (00,00))
         text('Picture Puzzle Game',display_width/2,display_height/4,60,black,'crackman.ttf')
-        #text('Marwan Mohamed',display_width/2,display_height/5,25,white,'coolvetica rg.ttf')
 
         button("Start Game",(display_width/2)-100,585,200,100,white,black,black,white,game_loop)
 
