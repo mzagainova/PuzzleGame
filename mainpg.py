@@ -328,37 +328,37 @@ def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None):
             if level == 1 and tile.count(True) == 6:
                 talker()
                 waiting_screen(0)
-                questionnaire_prompt(2)
+                #questionnaire_prompt(2)
                 game_loop(2)
             elif level == 2 and tile.count(True) == 8:
                 talker()
                 waiting_screen(1)
-                questionnaire_prompt(3)
+                #questionnaire_prompt(3)
                 game_loop(3)
             elif level == 3 and tile.count(True) == 8:
                 talker()
                 waiting_screen(2)
-                questionnaire_prompt(4)
+                #questionnaire_prompt(4)
                 game_loop(4)
             elif level == 4 and tile.count(True) == 8:
                 talker()
                 waiting_screen(3)
-                questionnaire_prompt(5)
+                #questionnaire_prompt(5)
                 game_loop(5)
             elif level == 5 and tile.count(True) == 8:
                 talker()
                 waiting_screen(4)
-                questionnaire_prompt(6)
+                #questionnaire_prompt(6)
                 game_loop(6)
             elif level == 6 and tile.count(True) == 8:
                 talker()
                 waiting_screen(5)
-                questionnaire_prompt(7)
+                #questionnaire_prompt(7)
                 game_loop(7)
             elif level == 7 and tile.count(True) == 8:
                 talker()
                 waiting_screen(6)
-                questionnaire_prompt(8)
+                #questionnaire_prompt(8)
                 game_intro()
 
 
