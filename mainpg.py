@@ -135,9 +135,9 @@ def questionnaire_prompt(n):
                 quit()
         gameDisplay.blit(background, (00,00))
         # References to images used
-        text('Please complete the questionnaire about the observed robot behavior.',(display_width/2),(display_height/2)-70,40,black,'OpenSans-Regular.ttf')
-        text('Once you have finished the questionnaire, press continue to move onto the next level.',(display_width/2),(display_height/2)-30,40,black,'OpenSans-Regular.ttf')
-        if(button_cont("Continue",(display_width/2)-100,(display_height/1.2),200,100,white,black,black,white)):
+        text('Please complete the questionnaire about behavior ' + str(n-2) + '.',(display_width/2),(display_height/2)-70,40,black,'OpenSans-Regular.ttf')
+        text('Once you have finished the questionnaire, you may continue onto the next level.',(display_width/2),(display_height/2)-30,40,black,'OpenSans-Regular.ttf')
+        if(button_cont("Next Level",(display_width/2)-100,(display_height/1.2),200,100,white,black,black,white)):
             pub = rospy.Publisher('questions', String, queue_size = 1)
             rate = rospy.Rate(50)
             #if at last behavior, publish end msg
@@ -168,7 +168,7 @@ def waiting_screen(n):
                 quit()
         gameDisplay.blit(background, (00,00))
         # References to images used
-        text('The robot is performing a reward behavior.',(display_width/2),(display_height/2)-70,40,black,'OpenSans-Regular.ttf')
+        text('The robot is performing reward behavior ' + str(n) + '.',(display_width/2),(display_height/2)-70,40,black,'OpenSans-Regular.ttf')
         rate = rospy.Rate(1)
         rate.sleep()
 
@@ -207,7 +207,6 @@ def final_ranking(n):
                 quit()
         gameDisplay.blit(background, (00,00))
         # References to images used
-        text('Thank you for completing this study.',(display_width/2),(display_height/3)-90,40,black,'OpenSans-Regular.ttf')
         text('Lastly, please complete the last ranking questionnaire.',(display_width/2),(display_height/3)-50,40,black,'OpenSans-Regular.ttf')
         text('You can replay the behaviors by pressing the buttons below.',(display_width/2),(display_height/3)-10,40,black,'OpenSans-Regular.ttf')
 
