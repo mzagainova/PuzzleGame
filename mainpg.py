@@ -63,6 +63,16 @@ rand_behaviors = random.sample(range(1, num_behaviors), num_behaviors-1)
 
 behavior_done = False
 
+# file for recording data about participant's session
+file = open('logfile.txt', 'w')
+file.write("Behaviors:\n")
+file.write(str(rand_behaviors))
+file.write("\nStart Time: \n")
+file.write(str(time.clock()))
+
+#array for keeping track of number of times behaviors are played
+plays = [0,0,0,0,0,0]
+
 def talker():
     pub = rospy.Publisher('trigger', String, queue_size = 1)
     rospy.init_node('talker', anonymous=True)
@@ -83,12 +93,13 @@ def button(msg,x,y,w,h,ib_c,ab_c,it_c,at_c,action=None):
 
     if x+w > pos[0] > x and y+h > pos[1] > y:
         pygame.draw.rect(gameDisplay, ab_c,(x,y,w,h))
-        text(msg,x+(w/2),y+(h/2),50,at_c,'LittleLordFontleroyNF.ttf')
+        text(msg,x+(w/2),y+(h/2),20,at_c,'OpenSans-Bold.ttf')
         if click[0] == 1 and action != None:
+            output_startTime(1)
             action()
     else:
         pygame.draw.rect(gameDisplay, ib_c,(x,y,w,h))
-        text(msg,x+(w/2),y+(h/2),50,it_c,'LittleLordFontleroyNF.ttf')
+        text(msg,x+(w/2),y+(h/2),20,it_c,'OpenSans-Bold.ttf')
 
 def button_cont(msg,x,y,w,h,ib_c,ab_c,it_c,at_c):
     pos = pygame.mouse.get_pos()
@@ -96,12 +107,12 @@ def button_cont(msg,x,y,w,h,ib_c,ab_c,it_c,at_c):
 
     if x+w > pos[0] > x and y+h > pos[1] > y:
         pygame.draw.rect(gameDisplay, ab_c,(x,y,w,h))
-        text(msg,x+(w/2),y+(h/2),50,at_c,'LittleLordFontleroyNF.ttf')
+        text(msg,x+(w/2),y+(h/2),20,at_c,'OpenSans-Bold.ttf')
         if click[0] == 1:
             return True
     else:
         pygame.draw.rect(gameDisplay, ib_c,(x,y,w,h))
-        text(msg,x+(w/2),y+(h/2),50,it_c,'LittleLordFontleroyNF.ttf')
+        text(msg,x+(w/2),y+(h/2),20,it_c,'OpenSans-Bold.ttf')
     return False
 
 
@@ -124,8 +135,8 @@ def questionnaire_prompt(n):
                 quit()
         gameDisplay.blit(background, (00,00))
         # References to images used
-        text('Please complete the questionnaire about the observed robot behavior.',(display_width/2),(display_height/2)-70,40,black,'coolvetica rg.ttf')
-        text('Once you have finished the questionnaire, press continue to move onto the next level.',(display_width/2),(display_height/2)-30,40,black,'coolvetica rg.ttf')
+        text('Please complete the questionnaire about the observed robot behavior.',(display_width/2),(display_height/2)-70,40,black,'OpenSans-Regular.ttf')
+        text('Once you have finished the questionnaire, press continue to move onto the next level.',(display_width/2),(display_height/2)-30,40,black,'OpenSans-Regular.ttf')
         if(button_cont("Continue",(display_width/2)-100,(display_height/1.2),200,100,white,black,black,white)):
             pub = rospy.Publisher('questions', String, queue_size = 1)
             rate = rospy.Rate(50)
@@ -157,10 +168,10 @@ def waiting_screen(n):
                 quit()
         gameDisplay.blit(background, (00,00))
         # References to images used
-        text('The robot is performing a reward behavior.',(display_width/2),(display_height/2)-70,40,black,'coolvetica rg.ttf')
+        text('The robot is performing a reward behavior.',(display_width/2),(display_height/2)-70,40,black,'OpenSans-Regular.ttf')
         rate = rospy.Rate(1)
         rate.sleep()
-        
+
         pub = rospy.Publisher('behavior_number', String, queue_size = 1)
         if n == 0:
             msg = str(0)
@@ -181,6 +192,7 @@ def waiting_screen(n):
         clock.tick(15)
 
 def final_ranking(n):
+    global plays
     intro = True
     global behavior_done
     pub = rospy.Publisher('behavior_number', String, queue_size = 4)
@@ -195,32 +207,38 @@ def final_ranking(n):
                 quit()
         gameDisplay.blit(background, (00,00))
         # References to images used
-        text('Thank you for completing this study.',(display_width/2),(display_height/3)-90,40,black,'coolvetica rg.ttf')
-        text('Lastly, please complete the last ranking questionnaire.',(display_width/2),(display_height/3)-50,40,black,'coolvetica rg.ttf')
-        text('You can replay the behaviors by pressing the buttons below.',(display_width/2),(display_height/3)-10,40,black,'coolvetica rg.ttf')
+        text('Thank you for completing this study.',(display_width/2),(display_height/3)-90,40,black,'OpenSans-Regular.ttf')
+        text('Lastly, please complete the last ranking questionnaire.',(display_width/2),(display_height/3)-50,40,black,'OpenSans-Regular.ttf')
+        text('You can replay the behaviors by pressing the buttons below.',(display_width/2),(display_height/3)-10,40,black,'OpenSans-Regular.ttf')
 
         pub.publish(str(100))
         if(button_cont("Behavior 1",(display_width/6)-100,(display_height/1.8),200,100,white,black,black,white)):
+            plays[0] += 1
             pub.publish(str(rand_behaviors[0]))
             while(behavior_done == False):
                 rate.sleep()
         elif(button_cont("Behavior 2",(display_width/2)-100,(display_height/1.8),200,100,white,black,black,white)):
+            plays[1] += 1
             pub.publish(str(rand_behaviors[1]))
             while(behavior_done == False):
                 rate.sleep()
         elif(button_cont("Behavior 3",(5*display_width/6)-100,(display_height/1.8),200,100,white,black,black,white)):
+            plays[2] += 1
             pub.publish(str(rand_behaviors[2]))
             while(behavior_done == False):
                 rate.sleep()
         elif(button_cont("Behavior 4",(display_width/6)-100,(display_height/1.4),200,100,white,black,black,white)):
+            plays[3] += 1
             pub.publish(str(rand_behaviors[3]))
             while(behavior_done == False):
                 rate.sleep()
         elif(button_cont("Behavior 5",(display_width/2)-100,(display_height/1.4),200,100,white,black,black,white)):
+            plays[4] += 1
             pub.publish(str(rand_behaviors[4]))
             while(behavior_done == False):
                 rate.sleep()
         elif(button_cont("Behavior 6",(5 * display_width/6)-100,(display_height/1.4),200,100,white,black,black,white)):
+            plays[5] += 1
             pub.publish(str(rand_behaviors[5]))
             while(behavior_done == False):
                 rate.sleep()
@@ -269,6 +287,19 @@ def l_random(level = 1):
         choice = l[level-1][random.randint(0,len(l[level-1])-1)]
         if l_final.count(choice) <= 1 : l_final.append(choice)
     return l_final
+
+def output_startTime(level):
+    file.write("\nLevel " + str(level) + " start time: \n")
+    file.write(str(time.clock()))
+
+def output_endTime(level):
+    file.write("\nLevel " + str(level) + " end time: \n")
+    file.write(str(time.clock()))
+
+def output_plays():
+    file.write("\nNumber of plays of behaviors: \n")
+    for n in plays:
+        file.write(str(plays))
 
 def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None):
     pygame.mixer.music.unpause()
@@ -334,39 +365,52 @@ def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None):
         if (Won == True):
             # time.sleep(0.4)
             if level == 1 and tile.count(True) == 6:
+                output_endTime(level)
                 talker()
                 waiting_screen(0)
+                output_startTime(level+1)
                 game_loop(2)
             elif level == 2 and tile.count(True) == 8:
+                output_endTime(level)
                 talker()
                 waiting_screen(1)
                 questionnaire_prompt(3)
+                output_startTime(level+1)
                 game_loop(3)
             elif level == 3 and tile.count(True) == 8:
+                output_endTime(level)
                 talker()
                 waiting_screen(2)
                 questionnaire_prompt(4)
+                output_startTime(level+1)
                 game_loop(4)
             elif level == 4 and tile.count(True) == 8:
+                output_endTime(level)
                 talker()
                 waiting_screen(3)
                 questionnaire_prompt(5)
                 game_loop(5)
             elif level == 5 and tile.count(True) == 8:
+                output_endTime(level)
                 talker()
                 waiting_screen(4)
                 questionnaire_prompt(6)
+                output_startTime(level+1)
                 game_loop(6)
             elif level == 6 and tile.count(True) == 8:
+                output_endTime(level)
                 talker()
                 waiting_screen(5)
                 questionnaire_prompt(7)
+                output_startTime(level+1)
                 game_loop(7)
             elif level == 7 and tile.count(True) == 8:
+                output_endTime(level)
                 talker()
                 waiting_screen(6)
                 questionnaire_prompt(8)
                 final_ranking(8)
+                output_plays()
                 game_intro()
 
 
