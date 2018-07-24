@@ -158,17 +158,15 @@ def waiting_screen(n):
         gameDisplay.blit(background, (00,00))
         # References to images used
         text('The robot is performing a reward behavior.',(display_width/2),(display_height/2)-70,40,black,'coolvetica rg.ttf')
-        rate = rospy.Rate(1)
-        rate.sleep()
-        
         pub = rospy.Publisher('behavior_number', String, queue_size = 1)
+        rate = rospy.Rate(1)
         if n == 0:
             msg = str(0)
         else:
             msg = str(rand_behaviors[n-1])
         #published number of random behavior to topic
         pub.publish(msg)
-
+        rate.sleep()
 
         #subscribes to reward behavior, calls callback when published
         sub = rospy.Subscriber("kiwi", String, callback)
