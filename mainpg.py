@@ -128,18 +128,18 @@ def questionnaire_prompt(n):
         text('Once you have finished the questionnaire, press continue to move onto the next level.',(display_width/2),(display_height/2)-30,40,black,'coolvetica rg.ttf')
         if(button_cont("Continue",(display_width/2)-100,(display_height/1.2),200,100,white,black,black,white)):
             pub = rospy.Publisher('questions', String, queue_size = 1)
-            rate = rospy.Rate(1)
+            rate = rospy.Rate(50)
             #if at last behavior, publish end msg
             if n == 8:
                 msg = "final ranking"
             else:
                 msg = "questions compelted"
             pub.publish(msg)
-            rate.sleep()
+            # rate.sleep()
             return
 
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(25)
 
 def callback(data):
     if data.data == 'behavior completed':
@@ -158,15 +158,17 @@ def waiting_screen(n):
         gameDisplay.blit(background, (00,00))
         # References to images used
         text('The robot is performing a reward behavior.',(display_width/2),(display_height/2)-70,40,black,'coolvetica rg.ttf')
-        pub = rospy.Publisher('behavior_number', String, queue_size = 1)
         rate = rospy.Rate(1)
+        rate.sleep()
+        
+        pub = rospy.Publisher('behavior_number', String, queue_size = 1)
         if n == 0:
             msg = str(0)
         else:
             msg = str(rand_behaviors[n-1])
         #published number of random behavior to topic
         pub.publish(msg)
-        rate.sleep()
+
 
         #subscribes to reward behavior, calls callback when published
         sub = rospy.Subscriber("kiwi", String, callback)
@@ -181,8 +183,8 @@ def waiting_screen(n):
 def final_ranking(n):
     intro = True
     global behavior_done
-    pub = rospy.Publisher('behavior_number', String, queue_size = 1)
-    rate = rospy.Rate(1)
+    pub = rospy.Publisher('behavior_number', String, queue_size = 4)
+    rate = rospy.Rate(50)
     #subscribes to reward behavior, calls callback when published
     sub = rospy.Subscriber("reward", String, callback)
 
@@ -193,37 +195,39 @@ def final_ranking(n):
                 quit()
         gameDisplay.blit(background, (00,00))
         # References to images used
-        text('Thank you for completing this study.',(display_width/2),(display_height/2)-70,40,black,'coolvetica rg.ttf')
-        text('Lastly, please complete the last ranking questionnaire. You can replay the behaviors by pressing the buttons below.',(display_width/2),(display_height/2)-30,40,black,'coolvetica rg.ttf')
+        text('Thank you for completing this study.',(display_width/2),(display_height/3)-90,40,black,'coolvetica rg.ttf')
+        text('Lastly, please complete the last ranking questionnaire.',(display_width/2),(display_height/3)-50,40,black,'coolvetica rg.ttf')
+        text('You can replay the behaviors by pressing the buttons below.',(display_width/2),(display_height/3)-10,40,black,'coolvetica rg.ttf')
 
-        if(button_cont("Behavior 1",(display_width/2)-100,(display_height/1.2),200,100,white,black,black,white)):
-            pub.publish(str(1))
+        pub.publish(str(100))
+        if(button_cont("Behavior 1",(display_width/6)-100,(display_height/1.8),200,100,white,black,black,white)):
+            pub.publish(str(rand_behaviors[0]))
             while(behavior_done == False):
                 rate.sleep()
-        elif(button_cont("Behavior 2",(display_width/2)-100,(display_height/1.2),200,100,white,black,black,white)):
-            pub.publish(str(2))
+        elif(button_cont("Behavior 2",(display_width/2)-100,(display_height/1.8),200,100,white,black,black,white)):
+            pub.publish(str(rand_behaviors[1]))
             while(behavior_done == False):
                 rate.sleep()
-        elif(button_cont("Behavior 3",(display_width/2)-100,(display_height/1.2),200,100,white,black,black,white)):
-            pub.publish(str(3))
+        elif(button_cont("Behavior 3",(5*display_width/6)-100,(display_height/1.8),200,100,white,black,black,white)):
+            pub.publish(str(rand_behaviors[2]))
             while(behavior_done == False):
                 rate.sleep()
-        elif(button_cont("Behavior 4",(display_width/2)-100,(display_height/1.2),200,100,white,black,black,white)):
-            pub.publish(str(4))
+        elif(button_cont("Behavior 4",(display_width/6)-100,(display_height/1.4),200,100,white,black,black,white)):
+            pub.publish(str(rand_behaviors[3]))
             while(behavior_done == False):
                 rate.sleep()
-        elif(button_cont("Behavior 5",(display_width/2)-100,(display_height/1.2),200,100,white,black,black,white)):
-            pub.publish(str(5))
+        elif(button_cont("Behavior 5",(display_width/2)-100,(display_height/1.4),200,100,white,black,black,white)):
+            pub.publish(str(rand_behaviors[4]))
             while(behavior_done == False):
                 rate.sleep()
-        elif(button_cont("Behavior 6",(display_width/2)-100,(display_height/1.2),200,100,white,black,black,white)):
-            pub.publish(str(6))
+        elif(button_cont("Behavior 6",(5 * display_width/6)-100,(display_height/1.4),200,100,white,black,black,white)):
+            pub.publish(str(rand_behaviors[5]))
             while(behavior_done == False):
                 rate.sleep()
 
         behavior_done = False
         pygame.display.update()
-        clock.tick(15)
+        clock.tick()
 
 def game_intro():
     print rand_behaviors
@@ -269,7 +273,7 @@ def l_random(level = 1):
 def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None):
     pygame.mixer.music.unpause()
     choosen = None
-    time.sleep(0.1)
+    # time.sleep(0.1)
     if old_x != None:
         x = old_x
     else:
@@ -328,11 +332,10 @@ def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None):
                     pygame.quit()
 
         if (Won == True):
-            time.sleep(0.4)
+            # time.sleep(0.4)
             if level == 1 and tile.count(True) == 6:
                 talker()
                 waiting_screen(0)
-                questionnaire_prompt(2)
                 game_loop(2)
             elif level == 2 and tile.count(True) == 8:
                 talker()
@@ -363,13 +366,14 @@ def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None):
                 talker()
                 waiting_screen(6)
                 questionnaire_prompt(8)
+                final_ranking(8)
                 game_intro()
 
 
             game_loop(level, choosen, tile, x)
             Won = None
         if (Won == False):
-            time.sleep(0.4)
+            # time.sleep(0.4)
             game_loop(level, choosen)
 
         pos = pygame.mouse.get_pos()

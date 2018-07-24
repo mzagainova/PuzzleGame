@@ -10,17 +10,24 @@ class BehaviorPlayer():
     def __init__(self):
 
         def callback(data):
+            if int(data.data) == 100:
+                self.performedBehaviors = []
+                return
+
             #action behavior processing
-            print(data)
+            if int(data.data) == 0 and len(self.performedBehaviors) > 1:
+                self.performedBehaviors = []
+
             if data not in self.performedBehaviors:
                 print("performing behavior")
-                rospy.sleep(2.0)
+                # time.sleep(1.0)
 
-                case = int(data)
+                case = int(data.data)
                 if case == 0:
                     self.robot.say("demo1", wait=True)
                 elif case == 1:
                     self.robot.say("dance1", wait=True)
+                    # time.sleep(4.0)
                 elif case == 2:
                     self.robot.say("compliment1", wait=True)
                 elif case == 3:
@@ -32,9 +39,12 @@ class BehaviorPlayer():
                 elif case == 6:
                     self.sound.playWave('/home/saunter/rosbuild_ws/saunter/saunter_interaction/speech/data/DanceSong.wav')
                     self.robot.do("shimmy", wait=True)
-                self.performedBehaviors += [data]
+                    # time.sleep(4.0)
 
-            rospy.Publisher("kiwi", String, queue_size = 1).publish("behavior completed")
+                self.performedBehaviors += [data]
+                self.robot.do("returnToNeutral", wait=True)
+
+            rospy.Publisher("kiwi", String, queue_size = 2).publish("behavior completed")
 
 
         # In ROS, nodes are uniquely named. If two nodes with the same
@@ -43,11 +53,11 @@ class BehaviorPlayer():
         # name for our 'listener' node so that multiple listeners can
         # run simultaneously.
         rospy.init_node('BehaviorServer', anonymous=True)
-        rospy.Subscriber("behavior_number", String, callback)
+        rospy.Subscriber("behavior_number", String, callback, queue_size = 4)
 
         self.robot = RobotManager("DB1")
         self.performedBehaviors = []
-        slef.sound = SoundClient()
+        self.sound = SoundClient()
 
 
 
