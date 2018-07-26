@@ -71,6 +71,12 @@ behavior_done = False
 
 # file for recording data about participant's session
 file = open('logfile{}.txt'.format(datetime.datetime.today().strftime('%Y-%m-%d_%H:%M:%S')), 'w')
+
+file_bestScore = open('highscores.txt', 'r')
+l1_bestScore = file_bestScore.readline()
+l2_bestScore = file_bestScore.readline()
+file_bestScore = open('highscores.txt', 'w')
+
 file.write("Behaviors:\n")
 file.write(str(rand_behaviors))
 file.write("\n\nLevel, Start Time (sec), End Time (sec), Duration (sec) \n")
@@ -241,10 +247,30 @@ def output_plays():
         file.write("{}, ".format(count))
 
 def displayTime(t0):
-    time_string = "Time: {}".format((pygame.time.get_ticks()/1000) - (t0/1000))
+    time_string = "Your Time: {}".format((pygame.time.get_ticks()/1000) - (t0/1000))
     text = font.render(time_string, True, white)
     gameDisplay.blit(text, (display_width/6, display_height/8))
 
+def displayHighScore(n):
+    if(n == 1):
+        score = "Best Time: " + str(l1_bestScore).strip('\n\r')
+    else:
+        score = "Best Time: " + str(l2_bestScore).strip('\n\r')
+    text = font.render(score, True, white)
+    gameDisplay.blit(text, (display_width/6, display_height/8 - 100))
+
+def updateHighScore(n, score):
+    global l1_bestScore
+    global l2_bestScore
+    print score
+    if n == 1:
+        if score < l1_bestScore:
+            l1_bestScore = score
+        file_bestScore.write(str(l1_bestScore) + '\n')
+    else:
+        if score < l2_bestScore:
+            l2_bestScore = score
+        file_bestScore.write(str(l2_bestScore) + '\n')
 
 def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None, t0 = 0):
     choosen = None
@@ -282,6 +308,7 @@ def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None, t0 = 0
         #text('Time ' + str(pygame.time.get_ticks()/1000),display_width/2,display_height/8 ,35,white,'zerovelo.ttf')
         gameDisplay.blit(backgroundGameLoop,(0,0))
         displayTime(t0)
+        displayHighScore(level)
         text('Level ' + str(level),display_width/2,display_height/8,35,white,'zerovelo.ttf')
         gameDisplay.blit(choosen[0],(660,280))
         gameDisplay.blit(choosen[1],(860,280))
@@ -291,13 +318,10 @@ def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None, t0 = 0
         gameDisplay.blit(choosen[5],(1060,480))
         gameDisplay.blit(choosen[6],(760,680))
         gameDisplay.blit(choosen[7],(960,680))
-        event = pygame.event.wait()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE or event.unicode == 'q':
-                pygame.quit()
 
         if (Won == True):
             if level == 1 and tile.count(True) == 8:
+                updateHighScore(level, pygame.time.get_ticks()/1000)
                 output_endTime(level)
                 talker()
                 waiting_screen(level)
@@ -305,17 +329,18 @@ def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None, t0 = 0
                 t0 = pygame.time.get_ticks()
                 game_loop(level+1, t0 = t0)
             if level == 2 and tile.count(True) == 8:
+                updateHighScore(level, pygame.time.get_ticks()/1000)
                 talker()
                 waiting_screen(level)
                 game_intro()
 
 
-            game_loop(level, choosen, tile, x)
+            game_loop(level, choosen, tile, x, t0)
             Won = None
 
         if (Won == False):
             # time.sleep(0.4)
-            game_loop(level, choosen)
+            game_loop(level, choosen, t0 = t0)
 
         pos = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
