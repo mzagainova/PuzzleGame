@@ -151,7 +151,10 @@ def waiting_screen(n):
         gameDisplay.blit(background, (00,00))
         # References to images used
 
-        text('Great job! You completed level ' + str(n) + '.',(display_width/2),(display_height/2)-70,40,black,'OpenSans-Regular.ttf')
+        if n == 1:
+            text('Great job! You completed level ' + str(n) + '.',(display_width/2),(display_height/2)-70,40,black,'OpenSans-Regular.ttf')
+        else:
+            text('Great job! You completed the game!',(display_width/2),(display_height/2)-70,40,black,'OpenSans-Regular.ttf')
         rate = rospy.Rate(1)
         rate.sleep()
 
@@ -294,13 +297,15 @@ def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None):
                 pygame.quit()
 
         if (Won == True):
-            if tile.count(True) == 8:
+            if level == 1 and tile.count(True) == 8:
                 output_endTime(level)
                 talker()
                 waiting_screen(level)
                 output_startTime(level+1)
                 game_loop(level+1)
             if level == 2 and tile.count(True) == 8:
+                talker()
+                waiting_screen(level)
                 game_intro()
 
 
