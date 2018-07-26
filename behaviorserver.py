@@ -24,7 +24,7 @@ class BehaviorPlayer():
 
                 case = int(data.data)
                 if case == 0:
-                    self.robot.say("demo1", wait=True)
+                    self.robot.say("demo2", wait=True)
                 elif case == 1:
                     self.robot.say("dance1", wait=True)
                     # time.sleep(4.0)
