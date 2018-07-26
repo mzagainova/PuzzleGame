@@ -26,7 +26,7 @@ endTime = 0
 font = pygame.font.SysFont('OpenSans-Regular.ttf', 35)
 
 gameDisplay = pygame.display.set_mode((display_width,display_height))
-pygame.display.toggle_fullscreen()
+#pygame.display.toggle_fullscreen()
 pygame.display.set_caption('Picture Puzzle Game')
 clock = pygame.time.Clock()
 # background pics
@@ -300,7 +300,7 @@ def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None):
                 waiting_screen(level)
                 output_startTime(level+1)
                 game_loop(level+1)
-
+            if level == 2 and tile.count(True) == 8:
                 game_intro()
 
 
