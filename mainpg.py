@@ -240,13 +240,13 @@ def output_plays():
     for count in plays:
         file.write("{}, ".format(count))
 
-def displayTime():
-    time_string = "Time: {}".format(pygame.time.get_ticks()/1000)
+def displayTime(t0):
+    time_string = "Time: {}".format((pygame.time.get_ticks()/1000) - (t0/1000))
     text = font.render(time_string, True, white)
     gameDisplay.blit(text, (display_width/6, display_height/8))
 
 
-def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None):
+def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None, t0 = 0):
     choosen = None
     # time.sleep(0.1)
     if old_x != None:
@@ -281,7 +281,7 @@ def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None):
         #displayTime()
         #text('Time ' + str(pygame.time.get_ticks()/1000),display_width/2,display_height/8 ,35,white,'zerovelo.ttf')
         gameDisplay.blit(backgroundGameLoop,(0,0))
-        displayTime()
+        displayTime(t0)
         text('Level ' + str(level),display_width/2,display_height/8,35,white,'zerovelo.ttf')
         gameDisplay.blit(choosen[0],(660,280))
         gameDisplay.blit(choosen[1],(860,280))
@@ -302,7 +302,8 @@ def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None):
                 talker()
                 waiting_screen(level)
                 output_startTime(level+1)
-                game_loop(level+1)
+                t0 = pygame.time.get_ticks()
+                game_loop(level+1, t0 = t0)
             if level == 2 and tile.count(True) == 8:
                 talker()
                 waiting_screen(level)
