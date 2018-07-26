@@ -101,7 +101,7 @@ def quitgame():
 
     quit()
 
-def button(msg,x,y,w,h,ib_c,ab_c,it_c,at_c,action=None):
+def button(msg,x,y,w,h,ib_c,ab_c,it_c,at_c,action=None, t0 = 0):
     pos = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
@@ -110,7 +110,7 @@ def button(msg,x,y,w,h,ib_c,ab_c,it_c,at_c,action=None):
         text(msg,x+(w/2),y+(h/2),20,at_c,'OpenSans-Bold.ttf')
         if click[0] == 1 and action != None:
             output_startTime(1)
-            action()
+            action(t0= t0)
     else:
         pygame.draw.rect(gameDisplay, ib_c,(x,y,w,h))
         text(msg,x+(w/2),y+(h/2),20,it_c,'OpenSans-Bold.ttf')
@@ -183,7 +183,7 @@ def waiting_screen(n):
         pygame.display.update()
         clock.tick(15)
 
-def game_intro():
+def game_intro(t0 = 0):
     print rand_behaviors
     pygame.mixer.music.pause()
     intro = True
@@ -195,7 +195,7 @@ def game_intro():
         gameDisplay.blit(background, (00,00))
         text('Picture Puzzle Game',display_width/2,display_height/4,60,black,'crackman.ttf')
 
-        button("Start Game",(display_width/2)-100,585,200,100,white,black,black,white,game_loop)
+        button("Start Game",(display_width/2)-100,585,200,100,white,black,black,white,game_loop, t0)
 
         pygame.display.update()
         clock.tick(15)
@@ -217,7 +217,7 @@ def check_same(tile, choosen):
 def l_random(level = 1):
     # 3 x 2
     # 4 x 2
-    l=[[raspberry, orange, greenapple, avocado],[elephant, fox, raccoon, penguin]]
+    l=[[raspberry, orange, avocado],[elephant, fox, raccoon, penguin]]
     l_final =[]
     while len(l_final) != len(l[level-1])*2:
         choice = l[level-1][random.randint(0,len(l[level-1])-1)]
@@ -304,23 +304,38 @@ def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None, t0 = 0
                 pygame.quit()
                 quit()
 
-        #displayTime()
-        #text('Time ' + str(pygame.time.get_ticks()/1000),display_width/2,display_height/8 ,35,white,'zerovelo.ttf')
-        gameDisplay.blit(backgroundGameLoop,(0,0))
-        displayTime(t0)
-        displayHighScore(level)
-        text('Level ' + str(level),display_width/2,display_height/8,35,white,'zerovelo.ttf')
-        gameDisplay.blit(choosen[0],(660,280))
-        gameDisplay.blit(choosen[1],(860,280))
-        gameDisplay.blit(choosen[2],(1060,280))
-        gameDisplay.blit(choosen[3],(660,480))
-        gameDisplay.blit(choosen[4],(860,480))
-        gameDisplay.blit(choosen[5],(1060,480))
-        gameDisplay.blit(choosen[6],(760,680))
-        gameDisplay.blit(choosen[7],(960,680))
+
+        if level == 1:
+            gameDisplay.blit(backgroundGameLoop,(0,0))
+            displayTime(t0)
+            displayHighScore(level)
+            text('Level ',display_width/2,display_height/8,35,white,'zerovelo.ttf')
+            gameDisplay.blit(choosen[0],(660,280))
+            gameDisplay.blit(choosen[1],(860,280))
+            gameDisplay.blit(choosen[2],(1060,280))
+            gameDisplay.blit(choosen[3],(660,480))
+            gameDisplay.blit(choosen[4],(860,480))
+            gameDisplay.blit(choosen[5],(1060,480))
+            event = pygame.event.wait()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE or event.unicode == 'q':
+                    pygame.quit()
+        else:
+            gameDisplay.blit(backgroundGameLoop,(0,0))
+            displayTime(t0)
+            displayHighScore(level)
+            text('Level ' + str(level),display_width/2,display_height/8,35,white,'zerovelo.ttf')
+            gameDisplay.blit(choosen[0],(660,280))
+            gameDisplay.blit(choosen[1],(860,280))
+            gameDisplay.blit(choosen[2],(1060,280))
+            gameDisplay.blit(choosen[3],(660,480))
+            gameDisplay.blit(choosen[4],(860,480))
+            gameDisplay.blit(choosen[5],(1060,480))
+            gameDisplay.blit(choosen[6],(760,680))
+            gameDisplay.blit(choosen[7],(960,680))
 
         if (Won == True):
-            if level == 1 and tile.count(True) == 8:
+            if level == 1 and tile.count(True) == 6:
                 updateHighScore(level, pygame.time.get_ticks()/1000)
                 output_endTime(level)
                 talker()
@@ -332,10 +347,11 @@ def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None, t0 = 0
                 updateHighScore(level, pygame.time.get_ticks()/1000)
                 talker()
                 waiting_screen(level)
-                game_intro()
+                t0 = pygame.time.get_ticks()
+                game_intro(t0)
 
 
-            game_loop(level, choosen, tile, x, t0)
+            game_loop(level, choosen, tile, x, t0 = t0)
             Won = None
 
         if (Won == False):
@@ -345,25 +361,40 @@ def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None, t0 = 0
         pos = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
 
-
-        if 860 > pos[0] > 660 and 480 > pos[1] > 280 and click[0] == 1:
-             tile1 = True
-        if 1060 > pos[0] > 860 and 480 > pos[1] > 280 and click[0] == 1:
-             tile2 = True
-        if 1260 > pos[0] > 1060 and 480 > pos[1] > 280 and click[0] == 1:
-             tile3 = True
-        #row 2
-        if 860 > pos[0] > 660 and 680 > pos[1] > 480 and click[0] == 1:
-             tile4 = True
-        if 1060 > pos[0] > 860 and 680 > pos[1] > 480 and click[0] == 1:
-             tile5 = True
-        if 1260 > pos[0] > 1060 and 680 > pos[1] > 480 and click[0] == 1:
-             tile6 = True
-        #row3
-        if 960 > pos[0] > 760 and 880 > pos[1] > 680 and click[0] == 1:
-             tile7 = True
-        if 1160 > pos[0] > 960 and 880 > pos[1] > 680 and click[0] == 1:
-             tile8 = True
+        if level == 1:
+            #row1
+            if 860 > pos[0] > 660 and 480 > pos[1] > 280 and click[0] == 1:
+                 tile1 = True
+            if 1060 > pos[0] > 860 and 480 > pos[1] > 280 and click[0] == 1:
+                 tile2 = True
+            if 1260 > pos[0] > 1060 and 480 > pos[1] > 280 and click[0] == 1:
+                 tile3 = True
+            #row 2
+            if 860 > pos[0] > 660 and 680 > pos[1] > 480 and click[0] == 1:
+                 tile4 = True
+            if 1060 > pos[0] > 860 and 680 > pos[1] > 480 and click[0] == 1:
+                 tile5 = True
+            if 1260 > pos[0] > 1060 and 680 > pos[1] > 480 and click[0] == 1:
+                tile6 = True
+        else:
+            if 860 > pos[0] > 660 and 480 > pos[1] > 280 and click[0] == 1:
+                 tile1 = True
+            if 1060 > pos[0] > 860 and 480 > pos[1] > 280 and click[0] == 1:
+                 tile2 = True
+            if 1260 > pos[0] > 1060 and 480 > pos[1] > 280 and click[0] == 1:
+                 tile3 = True
+            #row 2
+            if 860 > pos[0] > 660 and 680 > pos[1] > 480 and click[0] == 1:
+                 tile4 = True
+            if 1060 > pos[0] > 860 and 680 > pos[1] > 480 and click[0] == 1:
+                 tile5 = True
+            if 1260 > pos[0] > 1060 and 680 > pos[1] > 480 and click[0] == 1:
+                 tile6 = True
+            #row3
+            if 960 > pos[0] > 760 and 880 > pos[1] > 680 and click[0] == 1:
+                 tile7 = True
+            if 1160 > pos[0] > 960 and 880 > pos[1] > 680 and click[0] == 1:
+                 tile8 = True
 
 
         tile = [tile1, tile2, tile3, tile4, tile5, tile6, tile7, tile8]
@@ -377,30 +408,47 @@ def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None, t0 = 0
                 match_pub.publish("lost")
                 Won = False
 
+        if level == 1:
+            if not tile1: pygame.draw.rect(gameDisplay, white, (660,280,200,200))
+            if not tile2: pygame.draw.rect(gameDisplay, white, (860,280,200,200))
+            if not tile3: pygame.draw.rect(gameDisplay, white, (1060,280,200,200))
+            if not tile4: pygame.draw.rect(gameDisplay, white, (660,480,200,200))
+            if not tile5: pygame.draw.rect(gameDisplay, white, (860,480,200,200))
+            if not tile6: pygame.draw.rect(gameDisplay, white, (1060,480,200,200))
+        else:
+            if not tile1: pygame.draw.rect(gameDisplay, white, (660,280,200,200))
+            if not tile2: pygame.draw.rect(gameDisplay, white, (860,280,200,200))
+            if not tile3: pygame.draw.rect(gameDisplay, white, (1060,280,200,200))
+            if not tile4: pygame.draw.rect(gameDisplay, white, (660,480,200,200))
+            if not tile5: pygame.draw.rect(gameDisplay, white, (860,480,200,200))
+            if not tile6: pygame.draw.rect(gameDisplay, white, (1060,480,200,200))
+            if not tile7: pygame.draw.rect(gameDisplay, white, (760,680,200,200))
+            if not tile8: pygame.draw.rect(gameDisplay, white, (960,680,200,200))
 
-        if not tile1: pygame.draw.rect(gameDisplay, white, (660,280,200,200))
-        if not tile2: pygame.draw.rect(gameDisplay, white, (860,280,200,200))
-        if not tile3: pygame.draw.rect(gameDisplay, white, (1060,280,200,200))
-        if not tile4: pygame.draw.rect(gameDisplay, white, (660,480,200,200))
-        if not tile5: pygame.draw.rect(gameDisplay, white, (860,480,200,200))
-        if not tile6: pygame.draw.rect(gameDisplay, white, (1060,480,200,200))
-        if not tile7: pygame.draw.rect(gameDisplay, white, (760,680,200,200))
-        if not tile8: pygame.draw.rect(gameDisplay, white, (960,680,200,200))
-
-
-        # horizontal
-        pygame.draw.line(gameDisplay, black, (660,280),(1260,280),5)
-        pygame.draw.line(gameDisplay, black, (660,480),(1260,480),5)
-        pygame.draw.line(gameDisplay, black, (660,680),(1260,680),5)
-        pygame.draw.line(gameDisplay, black, (760,880),(1160,880),5)
-        # vertical
-        pygame.draw.line(gameDisplay, black, (660,280),(660,680),5)
-        pygame.draw.line(gameDisplay, black, (860,280),(860,680),5)
-        pygame.draw.line(gameDisplay, black, (1060,280),(1060,680),5)
-        pygame.draw.line(gameDisplay, black, (1260,280),(1260,680),5)
-        pygame.draw.line(gameDisplay, black, (760,680),(760,880),5)
-        pygame.draw.line(gameDisplay, black, (960,680),(960,880),5)
-        pygame.draw.line(gameDisplay, black, (1160,680),(1160,880),5)
+        if level == 1:
+            # horizontal
+            pygame.draw.line(gameDisplay, black, (660,280),(1260,280),5)
+            pygame.draw.line(gameDisplay, black, (660,480),(1260,480),5)
+            pygame.draw.line(gameDisplay, black, (660,680),(1260,680),5)
+            # vertical
+            pygame.draw.line(gameDisplay, black, (660,280),(660,680),5)
+            pygame.draw.line(gameDisplay, black, (860,280),(860,680),5)
+            pygame.draw.line(gameDisplay, black, (1060,280),(1060,680),5)
+            pygame.draw.line(gameDisplay, black, (1260,280),(1260,680),5)
+        else:
+            # horizontal
+            pygame.draw.line(gameDisplay, black, (660,280),(1260,280),5)
+            pygame.draw.line(gameDisplay, black, (660,480),(1260,480),5)
+            pygame.draw.line(gameDisplay, black, (660,680),(1260,680),5)
+            pygame.draw.line(gameDisplay, black, (760,880),(1160,880),5)
+            # vertical
+            pygame.draw.line(gameDisplay, black, (660,280),(660,680),5)
+            pygame.draw.line(gameDisplay, black, (860,280),(860,680),5)
+            pygame.draw.line(gameDisplay, black, (1060,280),(1060,680),5)
+            pygame.draw.line(gameDisplay, black, (1260,280),(1260,680),5)
+            pygame.draw.line(gameDisplay, black, (760,680),(760,880),5)
+            pygame.draw.line(gameDisplay, black, (960,680),(960,880),5)
+            pygame.draw.line(gameDisplay, black, (1160,680),(1160,880),5)
 
         pygame.display.update()
         clock.tick(100)
