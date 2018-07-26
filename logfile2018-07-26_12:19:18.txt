@@ -1,5 +1,0 @@
-Behaviors:
-[4, 3, 1, 2, 6, 5]
-
-Level, Start Time (sec), End Time (sec), Duration (sec) 
-1532632758.721, 1532632760.11, 
