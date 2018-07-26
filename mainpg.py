@@ -60,22 +60,26 @@ rocket = pygame.image.load('rocket.jpg')
 gameIcon = pygame.image.load('pictureIcon.png')
 pygame.display.set_icon(gameIcon)
 
-#random number array for behaviors
-num_behaviors = 7
 #list of num_behaviors random numbers, from 1 to num_behaviors
-rand_behaviors = random.sample(range(1, num_behaviors), num_behaviors-1)
+rand_behaviors = [random.sample(range(1, 6), 5), random.sample(range(6, 11), 5)]
+
+#random number for behavior set, either 0 or 1
 
 behavior_done = False
 
 # file for recording data about participant's session
 file = open('logfile{}.txt'.format(datetime.datetime.today().strftime('%Y-%m-%d_%H:%M:%S')), 'w')
+case = random.randint(0,1)
+file.write("Case number: " + str(case) + '\n')
 file.write("Behaviors:\n")
 file.write(str(rand_behaviors))
 file.write("\n\nLevel, Start Time (sec), End Time (sec), Duration (sec) \n")
 file.write(str(time.time()))
 
 #array for keeping track of number of times behaviors are played
-plays = [0,0,0,0,0,0]
+plays = [[0,0,0,0,0], [0,0,0,0,0]]
+
+playthrough = 1
 
 def talker():
     pub = rospy.Publisher('trigger', String, queue_size = 1)
@@ -145,7 +149,7 @@ def questionnaire_prompt(n):
             pub = rospy.Publisher('questions', String, queue_size = 1)
             rate = rospy.Rate(50)
             #if at last behavior, publish end msg
-            if n == 8:
+            if n == 7:
                 msg = "final ranking"
             else:
                 msg = "questions compelted"
@@ -161,6 +165,21 @@ def callback(data):
         global behavior_done
         behavior_done = True
         return
+
+def thankYou_screen():
+    intro = True
+
+    while intro:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        gameDisplay.blit(background, (00,00))
+        # References to images used
+
+        text('You have completed this study. Thank you for your time.',(display_width/2),(display_height/2)-70,40,black,'OpenSans-Regular.ttf')
+        pygame.display.update()
+        clock.tick(15)
 
 def waiting_screen(n):
     intro = True
@@ -182,7 +201,7 @@ def waiting_screen(n):
         if n == 0:
             msg = str(0)
         else:
-            msg = str(rand_behaviors[n-1])
+            msg = str(rand_behaviors[case][n-1])
         #published number of random behavior to topic
         pub.publish(msg)
         rate.sleep()
@@ -218,43 +237,52 @@ def final_ranking(n):
 
         pub.publish(str(100))
         if(button_cont("Behavior 1",(display_width/6)-100,(display_height/2),200,100,white,black,black,white)):
-            plays[0] += 1
-            pub.publish(str(rand_behaviors[0]))
+            plays[case][0] += 1
+            pub.publish(str(rand_behaviors[case][0]))
             while(behavior_done == False):
                 rate.sleep()
         elif(button_cont("Behavior 2",(display_width/2)-100,(display_height/2),200,100,white,black,black,white)):
-            plays[1] += 1
-            pub.publish(str(rand_behaviors[1]))
+            plays[case][1] += 1
+            pub.publish(str(rand_behaviors[case][1]))
             while(behavior_done == False):
                 rate.sleep()
         elif(button_cont("Behavior 3",(5*display_width/6)-100,(display_height/2),200,100,white,black,black,white)):
-            plays[2] += 1
-            pub.publish(str(rand_behaviors[2]))
+            plays[case][2] += 1
+            pub.publish(str(rand_behaviors[case][2]))
             while(behavior_done == False):
                 rate.sleep()
         elif(button_cont("Behavior 4",(display_width/6)-100,(display_height/1.6),200,100,white,black,black,white)):
-            plays[3] += 1
-            pub.publish(str(rand_behaviors[3]))
+            plays[case][3] += 1
+            pub.publish(str(rand_behaviors[case][3]))
             while(behavior_done == False):
                 rate.sleep()
         elif(button_cont("Behavior 5",(display_width/2)-100,(display_height/1.6),200,100,white,black,black,white)):
-            plays[4] += 1
-            pub.publish(str(rand_behaviors[4]))
+            plays[case][4] += 1
+            pub.publish(str(rand_behaviors[case][4]))
             while(behavior_done == False):
                 rate.sleep()
-        elif(button_cont("Behavior 6",(5 * display_width/6)-100,(display_height/1.6),200,100,white,black,black,white)):
-            plays[5] += 1
-            pub.publish(str(rand_behaviors[5]))
-            while(behavior_done == False):
-                rate.sleep()
-        elif(button_cont("End",(display_width/2)-200,(display_height/1.2),400,100,white,black,black,white)):
-            return
+
+        if playthrough == 2:
+            if(button_cont("End",(5 * display_width/6)-100,(display_height/1.6),200,100,black,white,white,black)):
+                output_plays()
+                thankYou_screen()
+        else:
+            if(button_cont("Continue",(5 * display_width/6)-100,(display_height/1.6),200,100,black,white,white,black)):
+                return
 
         behavior_done = False
         pygame.display.update()
         clock.tick()
 
 def game_intro():
+    global case
+    if playthrough == 2:
+        file.write("Case number: " + str(case) + '\n')
+        if case == 0:
+            case = 1
+        else:
+            case = 0
+
     print rand_behaviors
     pygame.mixer.music.pause()
     intro = True
@@ -307,18 +335,21 @@ def output_endTime(level):
     file.write('{}, {}\n'.format(seconds, seconds - startTime))
 
 def output_plays():
-    translation = {1: 'dance', 2:'compliment', 3:'encouragement', 4:'sassy remark', 5:'joke', 6:'dance with music'}
+    translation = {1: 'dance', 2:'compliment', 3:'encouragement', 4:'dance with music', 5:'joke', 6: 'dance2', 7:'compliment2', 8:'encouragement2', 9:'dance with music2', 10:'joke2'}
     file.write("\n")
-    for behavior in rand_behaviors:
+    for behavior in rand_behaviors[case]:
         file.write("{}, ".format(translation[behavior]))
 
     file.write("\n")
 
-    for count in plays:
+    for count in plays[case]:
         file.write("{}, ".format(count))
 
 
 def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None):
+    if playthrough == 2 and level == 1:
+        level = 2
+
     pygame.mixer.music.unpause()
     choosen = None
     # time.sleep(0.1)
@@ -420,15 +451,9 @@ def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None):
                 talker()
                 waiting_screen(5)
                 questionnaire_prompt(7)
-                output_startTime(level+1)
-                game_loop(7)
-            elif level == 7 and tile.count(True) == 8:
-                output_endTime(level)
-                talker()
-                waiting_screen(6)
-                questionnaire_prompt(8)
-                final_ranking(8)
-                output_plays()
+                final_ranking(7)
+                global playthrough
+                playthrough = 2
 
                 game_intro()
 

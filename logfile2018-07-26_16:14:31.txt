@@ -1,0 +1,6 @@
+Case number: 1
+Behaviors:
+[[2, 5, 1, 3, 4], [6, 10, 9, 8, 7]]
+
+Level, Start Time (sec), End Time (sec), Duration (sec) 
+1532646871.41, 1532646873.0, 
