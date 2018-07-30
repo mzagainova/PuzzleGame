@@ -268,6 +268,7 @@ def final_ranking(n):
                 thankYou_screen()
         else:
             if(button_cont("Continue",(5 * display_width/6)-100,(display_height/1.6),200,100,black,white,white,black)):
+                output_plays()
                 return
 
         behavior_done = False
@@ -277,11 +278,11 @@ def final_ranking(n):
 def game_intro():
     global case
     if playthrough == 2:
-        file.write("Case number: " + str(case) + '\n')
         if case == 0:
             case = 1
         else:
             case = 0
+        file.write("\n\nCase number: " + str(case) + '\n')
 
     print rand_behaviors
     pygame.mixer.music.pause()
@@ -293,8 +294,10 @@ def game_intro():
                 quit()
         gameDisplay.blit(background, (00,00))
         text('Picture Puzzle Game',display_width/2,display_height/4,60,black,'crackman.ttf')
-
-        button("Start Game",(display_width/2)-100,585,200,100,white,black,black,white,game_loop)
+        if playthrough == 2:
+            button("Start Round 2",(display_width/2)-100,585,200,100,white,black,black,white,game_loop)
+        else:
+            button("Start Game",(display_width/2)-100,585,200,100,white,black,black,white,game_loop)
 
         pygame.display.update()
         clock.tick(15)
@@ -416,35 +419,35 @@ def game_loop(level = 1, oldchoosen = None, oldtile = None, old_x = None):
                 output_endTime(level)
                 talker()
                 waiting_screen(0)
-                output_startTime(level+1)
+                output_startTime(level)
                 game_loop(2)
             elif level == 2 and tile.count(True) == 8:
                 output_endTime(level)
                 talker()
                 waiting_screen(1)
                 questionnaire_prompt(3)
-                output_startTime(level+1)
+                output_startTime(level)
                 game_loop(3)
             elif level == 3 and tile.count(True) == 8:
                 output_endTime(level)
                 talker()
                 waiting_screen(2)
                 questionnaire_prompt(4)
-                output_startTime(level+1)
+                output_startTime(level)
                 game_loop(4)
             elif level == 4 and tile.count(True) == 8:
                 output_endTime(level)
                 talker()
                 waiting_screen(3)
                 questionnaire_prompt(5)
-                output_startTime(level+1)
+                output_startTime(level)
                 game_loop(5)
             elif level == 5 and tile.count(True) == 8:
                 output_endTime(level)
                 talker()
                 waiting_screen(4)
                 questionnaire_prompt(6)
-                output_startTime(level+1)
+                output_startTime(level)
                 game_loop(6)
             elif level == 6 and tile.count(True) == 8:
                 output_endTime(level)
